@@ -39,7 +39,7 @@ public class Main {
                 }
             } else {
                 //playerAI.setT(t);
-                int movei = playerAI.getBestMove(t,'x');
+                int movei = playerAI.findBestMove(t,6);
                 t.chooseCase(movei, 'x');
                 System.out.println("po=="+movei);
 

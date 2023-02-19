@@ -18,17 +18,20 @@ public class PlayerAI {
 
     }
 
-    public int playMiniMax(Tableau t, char maximizingPlayer) {
+    public int playMiniMax(Tableau t, char maximizingPlayer,int depth,int alpha, int beta) {
         int score = evaluate(t);
 
         if (score != 0){
             return score;
         }
 
+
+        if (depth == 0) {
+            return evaluate(t); // evaluate board state using heuristic function
+        }
         if (t.isFull()){
             return 0;
         }
-        // Check if the current state is a terminal state
 
 
         // If the game is not over, search the game tree
@@ -38,9 +41,14 @@ public class PlayerAI {
             for (int i = 1; i <= 9; i++) {
                 if (t.isFree(i)) {
                     t.insertCase(i, 'x');
-                    int value = playMiniMax(t, 'o');
+                    int value = playMiniMax(t, 'o',depth - 1, alpha, beta);
                     bestValue = Math.max(bestValue, value);
                     t.resetCase(i);
+
+                    // Alpha-beta pruning
+                    if (beta <= alpha) {
+                        break;
+                    }
                 }
             }
             return bestValue;
@@ -50,9 +58,17 @@ public class PlayerAI {
             for (int i = 1; i <= 9; i++) {
                 if (t.isFree(i)) {
                     t.insertCase(i, 'o');
-                    int value = playMiniMax(t, 'x');
+                    int value = playMiniMax(t, 'x',depth - 1, alpha, beta);
                     bestValue = Math.min(bestValue, value);
                     t.resetCase(i);
+
+
+                    // Alpha-beta pruning
+                    if (beta <= alpha) {
+                        break;
+                    }
+
+
                 }
             }
             return bestValue;
@@ -110,38 +126,42 @@ public class PlayerAI {
         return 0;
     }
 
+//
+//    public int getTheBestPosition(Tableau t){
+//        Map<Integer, Integer> dataMap = new HashMap<>();
+//
+//
+//        int score=-1000;
+//        for (int i=1;i<=9;i++){
+//            if(t.isFree(i)){
+//                t.insertCase(i, 'x');
+//                score=this.playMiniMax(t,'x',);
+//                t.resetCase(i);
+//                dataMap.put(i, score);
+//            }
+//        }
+//        for (Map.Entry<Integer, Integer> entry : dataMap.entrySet()) {
+//            System.out.println("Key: " + entry.getKey() + " Value: " + entry.getValue());
+//        }
+//        return  getKeyWithMaxValue(dataMap);
+//    }
+//
+//    public static <K, V extends Comparable<V>> K getKeyWithMaxValue(Map<K, V> map) {
+//        Map.Entry<K, V> maxEntry = null;
+//        for (Map.Entry<K, V> entry : map.entrySet()) {
+//            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
+//                maxEntry = entry;
+//            }
+//        }
+//        return maxEntry.getKey();
+//    }
 
-    public int getTheBestPosition(Tableau t){
-        Map<Integer, Integer> dataMap = new HashMap<>();
 
-
-        int helper=0;
-        for (int i=1;i<=9;i++){
-            if(t.isFree(i)){
-                helper=this.playMiniMax(t,'x');
-                dataMap.put(i, helper);
-            }
-        }
-        for (Map.Entry<Integer, Integer> entry : dataMap.entrySet()) {
-            System.out.println("Key: " + entry.getKey() + " Value: " + entry.getValue());
-        }
-        return  getKeyWithMaxValue(dataMap);
-    }
-
-    public static <K, V extends Comparable<V>> K getKeyWithMaxValue(Map<K, V> map) {
-        Map.Entry<K, V> maxEntry = null;
-        for (Map.Entry<K, V> entry : map.entrySet()) {
-            if (maxEntry == null || entry.getValue().compareTo(maxEntry.getValue()) > 0) {
-                maxEntry = entry;
-            }
-        }
-        return maxEntry.getKey();
-    }
-
-
-    public int findBestMove(Tableau t) {
+    public int findBestMove(Tableau t,int depth) {
         int bestVal = Integer.MIN_VALUE;
         int bestMove = -1;
+        int alpha = Integer.MIN_VALUE;
+        int beta = Integer.MAX_VALUE;
 
         // Traverse all cells, evaluate minimax function
         // for all empty cells. And return the cell
@@ -149,9 +169,11 @@ public class PlayerAI {
         for (int i = 1; i <= 9; i++) {
             if (t.isFree(i)) {
                 // Make the move
-                //t.chooseCase(i, 'x');
-                int moveVal = playMiniMax(t, 'o');
-                //t.resetCase(i);
+                t.chooseCase(i, 'x');
+                int moveVal = playMiniMax(t, 'o',depth,alpha,beta); // on pense que l'adversaire va faire un choix intelligent , c'est ici qu'on block
+                //Logique derriere: ok, si je met le x ici, qu'est que humain va jouer? avec minmax je vais savoir la suite de la
+                //décision représenté par une valeur: pour chaque choix(i) on aura une valeur et on va prendre le meilleur
+                t.resetCase(i);
 
 
                 // If the value of the current move is
@@ -161,6 +183,16 @@ public class PlayerAI {
                     bestMove = i;
                     bestVal = moveVal;
                 }
+
+
+                alpha = Math.max(alpha, bestVal);
+
+                // Alpha-beta pruning
+                if (beta <= alpha) {
+                    break;
+                }
+
+
             }
 
         }
@@ -173,45 +205,29 @@ public class PlayerAI {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public int getBestMove(Tableau t, char maximizingPlayer) {
-        int bestMove = -1;
-        int bestScore = maximizingPlayer == 'x' ? Integer.MIN_VALUE : Integer.MAX_VALUE;
-
-        for (int i = 1; i <= 9; i++) {
-            if (t.isFree(i)) {
-                t.insertCase(i, maximizingPlayer);
-                int score = playMiniMax(t, maximizingPlayer == 'x' ? 'o' : 'x');
-                t.resetCase(i);
-
-                if (maximizingPlayer == 'x' && score > bestScore) {
-                    bestMove = i;
-                    bestScore = score;
-                } else if (maximizingPlayer == 'o' && score < bestScore) {
-                    bestMove = i;
-                    bestScore = score;
-                }
-            }
-        }
-
-        return bestMove;
-    }
-
+//
+//    public int getBestMove(Tableau t, char maximizingPlayer) {
+//        int bestMove = -1;
+//        int bestScore = maximizingPlayer == 'x' ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+//
+//        for (int i = 1; i <= 9; i++) {
+//            if (t.isFree(i)) {
+//                t.insertCase(i, maximizingPlayer);
+//                int score = playMiniMax(t, maximizingPlayer == 'x' ? 'o' : 'x');
+//                t.resetCase(i);
+//
+//                if (maximizingPlayer == 'x' && score > bestScore) {
+//                    bestMove = i;
+//                    bestScore = score;
+//                } else if (maximizingPlayer == 'o' && score < bestScore) {
+//                    bestMove = i;
+//                    bestScore = score;
+//                }
+//            }
+//        }
+//        return bestMove;
+//    }
+//
 
 
 
