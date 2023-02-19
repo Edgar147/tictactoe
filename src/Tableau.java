@@ -4,11 +4,10 @@ public class Tableau {
     private char[][] charArray;
     private boolean gameIsOver = false;
     private char winner = 'n';
-    private Stack<int[]> moves;
+
 
     Tableau(char[][] _charArray) {
         this.charArray = _charArray;
-        this.moves = new Stack();
         this.ceateTable();
     }
 
@@ -22,6 +21,7 @@ public class Tableau {
                 }
             }
         }
+        System.out.println("--------");
 
     }
 
@@ -35,7 +35,7 @@ public class Tableau {
                     return true;
                 }
 
-                ++c;
+                c++;
             }
         }
 
@@ -51,7 +51,7 @@ public class Tableau {
                     this.charArray[i][j] = '-';
                 }
 
-                ++c;
+                c++;
             }
         }
 
@@ -109,4 +109,72 @@ public class Tableau {
     public void setWinner(char winner) {
         this.winner = winner;
     }
+
+
+
+
+    public int countFreeCase() {
+        int c = 0;
+
+        for (int i = 0; i < this.charArray.length; ++i) {
+            for (int j = 0; j < this.charArray.length; ++j) {
+                if (charArray[i][j] == '-') {
+                    c++;
+                }
+
+            }
+        }
+    return  c+1;
+    }
+
+    public boolean isFree(int number) {
+        int c = 1;
+
+        for(int i = 0; i < this.charArray.length; ++i) {
+            for(int j = 0; j < this.charArray.length; ++j) {
+                if (c == number && this.charArray[i][j] == '-') {
+                    return true;
+                }
+
+                c++;
+            }
+        }
+
+        return false;
+    }
+
+
+
+
+
+    public char getCase(int number){
+        int c = 1;
+        char result=0;
+        for(int i = 0; i < this.charArray.length; ++i) {
+            for(int j = 0; j < this.charArray.length; ++j) {
+                if (c == number ) {
+                    result = charArray[i][j];
+                }
+
+                c++;
+            }
+        }
+        return result;
+    }
+
+    public void insertCase(int number, char player) {
+        int c = 1;
+
+        for(int i = 0; i < this.charArray.length; ++i) {
+            for(int j = 0; j < this.charArray.length; ++j) {
+                if (c == number && this.charArray[i][j] == '-') {
+                    this.charArray[i][j] = player;
+                }
+
+                c++;
+            }
+        }
+
+    }
+
 }

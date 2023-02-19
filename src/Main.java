@@ -38,9 +38,11 @@ public class Main {
                     }
                 }
             } else {
-                playerAI.setT(t);
-                int movei = playerAI.playMiniMax(t, 'x');
-                correctCase = t.chooseCase(movei, 'x');
+                //playerAI.setT(t);
+                int movei = playerAI.getBestMove(t,'x');
+                t.chooseCase(movei, 'x');
+                System.out.println("po=="+movei);
+
                 if (correctCase) {
                     if (!t.checkWin('x') && !t.checkDraw('x')) {
                         turn = 0;
@@ -49,6 +51,8 @@ public class Main {
                         turn = 1;
                     }
                 }
+                t.ceateTable();
+
             }
 
             t.ceateTable();
